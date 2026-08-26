@@ -1,0 +1,41 @@
+# Virtual environment
+venv/
+.venv/
+
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Database
+*.db
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data
+data/*.db
+data/output/
+!data/seed_data.json
+!data/test_images/
+
+# Additional Hackathon Ignores
+cloudflared
+backend.log
+*.db-shm
+*.db-wal
+data/chroma_db/
+frontend-v2/node_modules/
+frontend-v2/dist/
+frontend-v2/.vite/
