@@ -8,7 +8,10 @@
 [![Tests](https://img.shields.io/badge/Fintech%20Tests-160%2B%20Passed-success)](tests/test_fintech_adversarial.py)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE.md)
 
-
+> **🚀 Live Demo**
+> - 🌐 **Frontend (Vercel):** [merchantmesh.vercel.app](https://merchantmesh.vercel.app)
+> - ⚙️ **Backend API (Railway):** [merchantmesh-production.up.railway.app](https://merchantmesh-production.up.railway.app/health)
+> - 📦 **GitHub:** [github.com/Manideep-2007-ok/merchantmesh](https://github.com/Manideep-2007-ok/merchantmesh)
 ---
 
 ## 📌 Executive Summary
