@@ -709,7 +709,7 @@ export default function App() {
       
       {/* Welcome Modal for Hackathon Judges */}
       <AnimatePresence>
-        {(showWelcomeModal && (activeTab === 'catalog-bot' || activeTab === 'sales-bot')) && (
+        {(showWelcomeModal && (activeTab === 'catalog-bot' || activeTab === 'sales-engine')) && (
           <motion.div 
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
