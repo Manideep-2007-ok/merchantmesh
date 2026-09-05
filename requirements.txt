@@ -16,3 +16,4 @@ pydantic_core==2.46.4
 python-dotenv==1.2.3
 razorpay==2.0.1
 uvicorn==0.52.4
+Pillow
