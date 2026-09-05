@@ -801,11 +801,19 @@ export default function App() {
       
       <header className="sticky top-4 z-50 w-full max-w-4xl px-4 mt-6 mb-10">
         <div className="flex items-center justify-between bg-zinc-900/60 backdrop-blur-xl border border-zinc-800 shadow-sm rounded-full px-4 py-2">
-          <div className="flex items-center gap-2 pl-2">
-            <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+          <div className="flex items-center gap-2 pl-2 group" title="Click to copy Session URL" onClick={() => {
+            const url = new URL(window.location.href);
+            url.searchParams.set('session', getSessionId().replace('sess_', ''));
+            navigator.clipboard.writeText(url.toString());
+            alert('Session URL copied to clipboard! Open this exact link on your phone.');
+          }}>
+            <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center cursor-pointer">
               <svg className="text-zinc-900 w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 22h20L12 2z"/></svg>
             </div>
-            <span className="font-semibold text-sm tracking-tight text-white hidden sm:block">MerchantMesh</span>
+            <span className="font-semibold text-sm tracking-tight text-white hidden sm:block cursor-pointer">MerchantMesh</span>
+            <span className="text-xs text-zinc-500 font-mono ml-2 hidden sm:block bg-zinc-800/50 group-hover:bg-zinc-700/80 transition-colors px-2 py-0.5 rounded-full border border-zinc-700/50 cursor-pointer">
+              {getSessionId().slice(0,10)}
+            </span>
           </div>
 
           <NavigationMenu>
