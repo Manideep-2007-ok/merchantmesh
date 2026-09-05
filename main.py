@@ -1364,26 +1364,19 @@ async def get_order_status(order_id: str, session_id: str | None = None):
         
         # --- NEW HACKATHON HOTFIX: Active Polling for Payment Status ---
         if internal_status in ["PENDING_PAYMENT", "ACTIVE_RESERVATION"] and row["payment_link_url"]:
-            from core.razorpay_client import RazorpayClient
-            import json
-            import os
             try:
-                # Extract payment_link_id from the URL (e.g., https://rzp.io/i/payment_link_id)
-                plink_id = None
+                from core.razorpay_client import razorpay_client
+                import json
+                import os
                 
-                # Check DB for stored razorpay_payment_link_id first
+                plink_id = None
                 cursor.execute("SELECT payment_link_id FROM orders WHERE id = ?", (order_id,))
                 plink_row = cursor.fetchone()
                 if plink_row and plink_row["payment_link_id"]:
                     plink_id = plink_row["payment_link_id"]
                 
                 if plink_id:
-                    rzp = RazorpayClient(
-                        api_key=os.getenv("RAZORPAY_KEY_ID"),
-                        api_secret=os.getenv("RAZORPAY_KEY_SECRET"),
-                        simulation_mode=False if os.getenv("RAZORPAY_KEY_ID") else True
-                    )
-                    plink_data = rzp.fetch_payment_link(plink_id)
+                    plink_data = razorpay_client.fetch_payment_link(plink_id)
                     
                     if plink_data.get("status") == "paid":
                         # Auto-settle the order via Route
