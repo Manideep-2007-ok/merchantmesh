@@ -453,7 +453,7 @@ export default function App() {
          });
          
          if (auction.deals && auction.deals.some(r => r.status === 'ACCEPTED')) {
-            playSound('success');
+            
             setFullAuctionResult(auction);
             setVisualizerPhase(3);
             setVisualizerLogs(prev => [...prev, '[SUPERVISOR] Auction complete. Presenting options.']);
@@ -541,14 +541,19 @@ export default function App() {
             
             // Only show the link message once
             if (!linkShown) {
+              setChatMessages(prev => {
+                if(prev.some(m => m.paymentLink === res.payment_link_url)) return prev;
+                return [...prev, { role: 'ai', text: ` 🟢 Merchant Confirmed Stock!
+ Razorpay Payment Link generated.
+
+ Link expires in 15 minutes. Complete payment to lock your deal.`, paymentLink: res.payment_link_url }];
+              });
               linkShown = true;
-              playSound('success');
+              
+              linkShown = true;
+              
               if (res.payment_link_url && !res.payment_link_url.includes('sim_')) {
-                setChatMessages(prev => [...prev, { 
-                  role: 'ai', 
-                  text: ` Merchant Accepted!\n Razorpay Payment Link generated.\n\n Link expires in 15 minutes. Complete payment to lock your deal.`,
-                  paymentLink: res.payment_link_url
-                }]);
+                
                 // Keep polling to catch the PAID status
               } else {
                 clearInterval(intervalId);
@@ -575,7 +580,7 @@ export default function App() {
           } else if (res.status === 'PAID' || res.status === 'SETTLED') {
             // Real Razorpay webhook confirmed payment
             clearInterval(intervalId);
-            playSound('success');
+            
             setChatMessages(prev => [...prev, { role: 'ai', text: ` Payment confirmed via Razorpay!\n\n Razorpay Route Settlement:\n• Total: ₹${auctionResult.final_price}\n• Merchant Payout (100%): ₹${auctionResult.final_price}\n• Platform Fee (0%): ₹0\n\nOrder ${pendingOrderId} is fully settled. ` }]);
             setPendingOrderId(null);
             setTimeout(() => {
@@ -1387,7 +1392,7 @@ export default function App() {
                   </div>
                 )}
 
-                {pendingOrderId && (
+                {pendingOrderId && !chatMessages.some(m => m.paymentLink) && (
                   <div className="flex w-full justify-center pt-4 pb-10">
                     <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-500">
                       <div className="flex items-center gap-3 mb-4">
