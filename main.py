@@ -143,53 +143,10 @@ async def _periodic_sweeper_task():
 
 
 
-async def _sync_chroma_background():
-    """Syncs ChromaDB in the background so it doesn't block server startup."""
-    try:
-        from core.chroma_store import add_product_to_vector_store
-        from data.database import get_db_connection
-        import json as _json
-        import asyncio
-        
-        await asyncio.to_thread(asyncio.sleep, 5) # Let the server breathe first
-        
-        conn2 = get_db_connection()
-        cur2 = conn2.cursor()
-        cur2.execute("SELECT id, product_name, category, search_tags_json FROM products")
-        rows = cur2.fetchall()
-        print(f"🔄 Starting background ChromaDB sync for {len(rows)} products...")
-        
-        for row in rows:
-            tags = _json.loads(row["search_tags_json"] or "[]")
-            text = f"{row['product_name']} in {row['category']}. Keywords: {', '.join(tags)}"
-            await asyncio.to_thread(
-                add_product_to_vector_store,
-                product_id=row["id"], 
-                text=text, 
-                metadata={"category": row["category"], "product_name": row["product_name"]}
-            )
-        conn2.close()
-        print("✅ Background ChromaDB sync complete!")
-    except Exception as e:
-        print(f"⚠️ ChromaDB sync error (non-fatal): {e}")
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """FastAPI lifespan context manager: initializes database schema, seeds on empty, and runs sweeper daemon."""
+    """FastAPI lifespan context manager."""
     init_db()
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM products")
-        count = cursor.fetchone()[0]
-        if count == 0:
-            print(" Database is empty. Auto-seeding with demo data...")
-            _seed_database()
-            # Start background sync
-            asyncio.create_task(_sync_chroma_background())
-    finally:
-        conn.close()
-
     sweeper_task = asyncio.create_task(_periodic_sweeper_task())
     yield
     sweeper_task.cancel()
