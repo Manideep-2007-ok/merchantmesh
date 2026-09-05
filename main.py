@@ -498,6 +498,10 @@ async def parse_catalog(
         raise HTTPException(status_code=500, detail="Internal server error while parsing catalog item.")
 
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 @app.get("/api/product-card/{product_id}")
 def get_product_card_image(product_id: str):
     """Serves high-contrast social-media ready product cards composited by image_gen.py."""
