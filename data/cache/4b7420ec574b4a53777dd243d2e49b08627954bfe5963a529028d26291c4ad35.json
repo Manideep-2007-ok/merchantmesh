@@ -1,0 +1,35 @@
+{
+  "product_name": "Nike Air 1",
+  "category": "Footwear > Sneakers",
+  "search_tags": [
+    "nike",
+    "air",
+    "sneakers",
+    "shoes",
+    "footwear",
+    "men"
+  ],
+  "sizes_available": [
+    "5 UK",
+    "6 UK",
+    "7 UK",
+    "8 UK",
+    "9 UK",
+    "10 UK",
+    "11 UK",
+    "12 UK"
+  ],
+  "listed_price": 45000,
+  "floor_price": 30000,
+  "stock_quantity": 25,
+  "missing_information": [],
+  "discrepancies": [],
+  "is_prohibited": false,
+  "prohibited_reason": null,
+  "clarification_needed": false,
+  "clarification_message": null,
+  "whatsapp_status": "Nike Air 1 \u2013 Fresh kicks in stock!",
+  "instagram_caption": "Step up your game with the iconic Nike Air 1. #Nike #Air1 #Sneakers #Style",
+  "is_degraded": false,
+  "extraction_source": "ai"
+}

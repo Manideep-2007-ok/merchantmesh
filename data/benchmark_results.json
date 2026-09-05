@@ -1,0 +1,17 @@
+{
+  "total_deals": 100,
+  "deals_accepted": 67,
+  "conversion_rate_pct": 67.0,
+  "deadlocks": 16,
+  "lowballs_blocked": 12,
+  "max_turns_reached": 5,
+  "floor_breaches": 0,
+  "total_gmv_inr": 159276,
+  "total_savings_inr": 32316,
+  "platform_fee_inr": 3185,
+  "net_merchant_payout_inr": 156091,
+  "avg_turns": 4.5,
+  "p50_latency_ms": 1420.5,
+  "p95_latency_ms": 3840.2,
+  "execution_time_seconds": 45.8
+}
