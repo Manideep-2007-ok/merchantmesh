@@ -1359,7 +1359,47 @@ async def get_order_status(order_id: str, session_id: str | None = None):
         if not row:
             raise HTTPException(status_code=404, detail="Order not found.")
         
+        
         internal_status = row["payment_status"]
+        
+        # --- NEW HACKATHON HOTFIX: Active Polling for Payment Status ---
+        if internal_status in ["PENDING_PAYMENT", "ACTIVE_RESERVATION"] and row["payment_link_url"]:
+            from core.razorpay_client import RazorpayClient
+            import json
+            import os
+            try:
+                # Extract payment_link_id from the URL (e.g., https://rzp.io/i/payment_link_id)
+                plink_id = None
+                
+                # Check DB for stored razorpay_payment_link_id first
+                cursor.execute("SELECT payment_link_id FROM orders WHERE id = ?", (order_id,))
+                plink_row = cursor.fetchone()
+                if plink_row and plink_row["payment_link_id"]:
+                    plink_id = plink_row["payment_link_id"]
+                
+                if plink_id:
+                    rzp = RazorpayClient(
+                        api_key=os.getenv("RAZORPAY_KEY_ID"),
+                        api_secret=os.getenv("RAZORPAY_KEY_SECRET"),
+                        simulation_mode=False if os.getenv("RAZORPAY_KEY_ID") else True
+                    )
+                    plink_data = rzp.fetch_payment_link(plink_id)
+                    
+                    if plink_data.get("status") == "paid":
+                        # Auto-settle the order via Route
+                        try:
+                            rzp.settle_order_via_route(order_id=order_id, platform_fee_percentage=2.0)
+                        except Exception as e:
+                            print("Auto-settle error:", e)
+                            
+                        # Update DB to PAID
+                        cursor.execute("UPDATE orders SET payment_status = 'PAID' WHERE id = ?", (order_id,))
+                        conn.commit()
+                        internal_status = "PAID"
+            except Exception as e:
+                print("Active polling error:", e)
+        # -------------------------------------------------------------
+
         # Map internal payment_status to frontend-friendly state
         status_map = {
             "AWAITING_MERCHANT": "PENDING_MERCHANT",
