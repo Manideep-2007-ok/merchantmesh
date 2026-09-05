@@ -4,11 +4,12 @@ import sys
 from datetime import datetime, timedelta, timezone
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from data.database import get_db_connection
+from data.database import get_db_connection, init_db
 
 
 def seed_from_json():
     """Reads seed data from JSON and inserts it into the database cleanly."""
+    init_db()
     conn = get_db_connection()
     try:
         cursor = conn.cursor()
