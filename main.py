@@ -155,6 +155,21 @@ async def lifespan(app: FastAPI):
         if count == 0:
             print(" Database is empty. Auto-seeding with demo data...")
             _seed_database()
+            # Sync all seeded products to ChromaDB for vector search
+            try:
+                from core.chroma_store import add_product_to_vector_store
+                conn2 = get_db_connection()
+                cur2 = conn2.cursor()
+                cur2.execute("SELECT id, product_name, category, search_tags_json FROM products")
+                for row in cur2.fetchall():
+                    import json as _json
+                    tags = _json.loads(row["search_tags_json"] or "[]")
+                    text = f"{row['product_name']} in {row['category']}. Keywords: {', '.join(tags)}"
+                    add_product_to_vector_store(product_id=row["id"], text=text, metadata={"category": row["category"], "product_name": row["product_name"]})
+                conn2.close()
+                print("✅ ChromaDB synced with seeded products!")
+            except Exception as e:
+                print(f"⚠️ ChromaDB sync error (non-fatal): {e}")
     finally:
         conn.close()
 
@@ -173,10 +188,10 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Restrict CORS to local development ports and standard preview hostnames
+# Allow CORS from local dev, Vercel previews, and Railway
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:[0-9]+)?",
+    allow_origin_regex=r"(http://(localhost|127\.0\.0\.1)(:[0-9]+)?|https://.*\.vercel\.app|https://.*\.up\.railway\.app)",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
